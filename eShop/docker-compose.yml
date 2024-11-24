@@ -1,0 +1,35 @@
+version: '3.4'
+
+services:
+  eshop.api:
+    image: ${DOCKER_REGISTRY-}webapi
+    container_name: eshop-api
+    build:
+      context: .
+      dockerfile: Web.API/Dockerfile
+
+  eshop.db:
+    image: postgres:latest
+    container_name: eshop-db
+    environment:
+      - POSTGRES_DB=eshop
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./.containers/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  eshop.mq:
+    image: rabbitmq:3-management
+    container_name: eshop-mq
+    hostname: eshop-mq
+    volumes:
+        - ./.containers/queue/data/:/var/lib/rabbitmq
+        - ./.containers/queue/log/:/var/log/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_DEFAULT_PASS: guest
